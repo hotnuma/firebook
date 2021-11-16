@@ -211,7 +211,7 @@ bool _writeMd(const CString &inpath, const CString &search)
             outbuff += p;
             outbuff += "](";
             outbuff += value;
-            outbuff += ")\n";
+            outbuff += ")\\\n";
         }
         else if (header && line == END)
         {
