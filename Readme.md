@@ -1,3 +1,7 @@
+#### Firebook
+
+Exports a submenu from bookmark.html file into a md file.
+
 #### Install
 
 ```bash    
