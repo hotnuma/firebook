@@ -105,7 +105,7 @@ bool _writeMd(const CString &inpath, const CString &search)
 
             outbuff += "### ";
             outbuff += value;
-            outbuff += "\n";
+            outbuff += "\n\n";
 
             header = true;
         }
@@ -146,16 +146,15 @@ bool _writeMd(const CString &inpath, const CString &search)
                 outbuff += valcpy;
                 outbuff += "](";
                 outbuff += value;
-                outbuff += ")";
+                outbuff += ")  \n\n";
 
                 free(valcpy);
             }
             else
             {
                 outbuff += value;
+                outbuff += "  \n\n";
             }
-
-            outbuff += "  \n";
         }
         else if (header && line == END)
         {
@@ -163,7 +162,7 @@ bool _writeMd(const CString &inpath, const CString &search)
         }
     }
 
-    outbuff += "\n";
+    //outbuff += "\n";
 
     if (!CFile::write(outpath, outbuff))
         return 1;
