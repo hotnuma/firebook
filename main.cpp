@@ -13,6 +13,8 @@
 #define HREF        "<DT><A HREF=\""
 #define HREF_LEN    13
 
+#define MAXLEN      60
+
 bool _writeMd(const CString &inpath, const CString &search);
 
 int main(int argc, char **argv)
@@ -133,7 +135,26 @@ bool _writeMd(const CString &inpath, const CString &search)
             outbuff += "* ";
             outbuff += p;
             outbuff += "\n    \n    ";
-            outbuff += value;
+
+            int len = strlen(value);
+            if (len > MAXLEN)
+            {
+                char *valcpy = strdup(value);
+                valcpy[MAXLEN] = '\0';
+
+                outbuff += "[";
+                outbuff += valcpy;
+                outbuff += "](";
+                outbuff += value;
+                outbuff += ")";
+
+                free(valcpy);
+            }
+            else
+            {
+                outbuff += value;
+            }
+
             outbuff += "  \n";
         }
         else if (header && line == END)
@@ -141,6 +162,8 @@ bool _writeMd(const CString &inpath, const CString &search)
             break;
         }
     }
+
+    outbuff += "\n";
 
     if (!CFile::write(outpath, outbuff))
         return 1;
