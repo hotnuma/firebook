@@ -1,6 +1,6 @@
 #### Firebook
 
-Exports a submenu from a `bookmark.html file into a md file.
+Exports a submenu from a bookmark.html file into a md file.
 
 #### Install
 
