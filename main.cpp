@@ -15,46 +15,6 @@
 
 #define MAXLEN      60
 
-bool _writeMd(const CString &inpath, const CString &search);
-
-int main(int argc, char **argv)
-{
-    CString inpath;
-    CString search;
-
-    int n = 1;
-    while (n < argc)
-    {
-        CString part = argv[n];
-
-        // Input file.
-        if (part == "-i")
-        {
-            if (++n >= argc)
-                return 1;
-
-            inpath = argv[n];
-        }
-        else
-        {
-            if (!search.isEmpty())
-                return 1;
-
-            search = argv[n];
-        }
-
-        n++;
-    }
-
-    if (inpath.isEmpty() || search.isEmpty())
-        return 0;
-
-    if (!_writeMd(inpath, search))
-        return 1;
-
-    return 0;
-}
-
 bool _writeMd(const CString &inpath, const CString &search)
 {
     CString temp = search;
@@ -68,11 +28,11 @@ bool _writeMd(const CString &inpath, const CString &search)
     if (!file.read(inpath))
         return 1;
 
-    CString outbuff;
-
     CString line;
-    CString value;
+
+    CString outbuff;
     bool header = false;
+    CString value;
 
     while (file.getLine(line))
     {
@@ -146,28 +106,64 @@ bool _writeMd(const CString &inpath, const CString &search)
                 outbuff += valcpy;
                 outbuff += "](";
                 outbuff += value;
-                outbuff += ")  \n\n";
+                outbuff += ")\n\n";
 
                 free(valcpy);
             }
             else
             {
                 outbuff += value;
-                outbuff += "  \n\n";
+                outbuff += "\n\n";
             }
         }
-        else if (header && line == END)
+        else if (header && strncmp(start, END, END_LEN) == 0)
         {
             break;
         }
     }
 
-    //outbuff += "\n";
-
     if (!CFile::write(outpath, outbuff))
         return 1;
 
     return true;
+}
+
+int main(int argc, char **argv)
+{
+    CString inpath;
+    CString search;
+
+    int n = 1;
+    while (n < argc)
+    {
+        CString part = argv[n];
+
+        // Input file.
+        if (part == "-i")
+        {
+            if (++n >= argc)
+                return 1;
+
+            inpath = argv[n];
+        }
+        else
+        {
+            if (!search.isEmpty())
+                return 1;
+
+            search = argv[n];
+        }
+
+        n++;
+    }
+
+    if (inpath.isEmpty() || search.isEmpty())
+        return 0;
+
+    if (!_writeMd(inpath, search))
+        return 1;
+
+    return 0;
 }
 
 
