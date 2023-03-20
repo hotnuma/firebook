@@ -6,6 +6,7 @@ INCLUDEPATH =
 PKGCONFIG =
 
 PKGCONFIG += tinyc
+PKGCONFIG += gumbo
 
 HEADERS =
 

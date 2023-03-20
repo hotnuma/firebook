@@ -1,82 +1,134 @@
 #if 0
 
-bool _writeHtml(const CString &inpath, const CString &search);
+#include <cfile.h>
+#include <libapp.h>
+#include <libpath.h>
+#include <ctype.h>
+#include <string.h>
 
-bool _writeHtml(const CString &inpath, const CString &search)
+#include <print.h>
+
+#define DESC        "<DT><H3 "
+#define DESC_LEN    8
+#define END         "</DL><p>"
+#define END_LEN     8
+#define HREF        "<DT><A HREF=\""
+#define HREF_LEN    13
+
+#define MAXLEN      60
+
+bool _writeMd(const char *inpath, const char *search)
 {
-    CString temp = search;
-    temp.replace(" ", "_");
+    if (!inpath || !strlen(inpath) || !search || !strlen(search))
+        return false;
 
-    CString outpath = inpath;
-    pathStripExt(outpath);
-    outpath += strFmt("_%s.html", temp.c_str());
+    CStringAuto *temp = cstr_new(search);
+    cstr_replace(temp, " ", "_", true);
 
-    CFile file;
-    if (!file.read(inpath))
-        return 1;
+    CStringAuto *outpath = cstr_new(inpath);
+    path_strip_ext(outpath, true);
+    cstr_append_c(outpath, ' ');
+    cstr_append(outpath, c_str(temp));
+    cstr_append(outpath, ".md");
 
-    CString outbuff;
+    CFileAuto *file = cfile_new();
+    if (!cfile_read(file, inpath))
+        return false;
 
-    outbuff += "<!DOCTYPE NETSCAPE-Bookmark-file-1>\n";
-    outbuff += "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n";
-    outbuff += "<TITLE>Bookmarks</TITLE>\n";
-    outbuff += "<H1>Menu des marque-pages</H1>\n";
-    outbuff += "\n";
-    outbuff += "<DL><p>\n";
+    CStringAuto *line = cstr_new_size(512);
 
-    CString line;
-    bool wline = false;
+    CStringAuto *outbuff = cstr_new_size(1024);
+    bool header = false;
+    CStringAuto *value = cstr_new_size(64);
 
-    while (file.getLine(line))
+    while (cfile_getline(file, line))
     {
-        const char *p = line.c_str();
+        char *start = cstr_data(line);
+        char *p = NULL;
 
-        while (isspace(*p)) ++p;
+        while (isspace(*start)) ++start;
 
-        if (line.startsWith(DESC))
+        // write header
+        if (!header && strncmp(start, DESC, DESC_LEN) == 0)
         {
-            p += strlen(DESC);
+            start += DESC_LEN;
 
-            if ((p = strchr(p, '>')) == nullptr)
+            if ((start = strchr(start, '>')) == NULL)
+                return false;
+
+            ++start;
+
+            const char *end;
+            if ((end = strchr(start, '<')) == NULL)
+                return false;
+
+            cstr_copy_len(value, start, end - start);
+
+            if (cstr_compare(value, search, true) != 0)
+                continue;
+
+            print(c_str(value));
+
+            cstr_append(outbuff, "#### ");
+            cstr_append(outbuff, c_str(value));
+            cstr_append(outbuff, "\n\n");
+
+            header = true;
+        }
+
+        // write link
+        else if (header && (p = strstr(start, HREF)) != NULL)
+        {
+            p += HREF_LEN;
+
+            char *end;
+            if ((end = strchr(p, '\"')) == NULL)
+                return false;
+
+            cstr_copy_len(value, p, end - p);
+
+            if ((p = strchr(end, '>')) == NULL)
                 return false;
 
             ++p;
 
-            const char *end;
-            if ((end = strchr(p, '<')) == nullptr)
+            if ((end = strchr(p, '<')) == NULL)
                 return false;
 
-            CString desc;
-            desc.append(p, end - p);
+            *end = '\0';
 
-            if (desc == search)
+            cstr_append(outbuff, "* ");
+            cstr_append(outbuff, p);
+            cstr_append(outbuff, "\n    \n    ");
+
+            int len = cstr_size(value);
+            if (len > MAXLEN)
             {
-                print(desc.c_str());
+                char *valcpy = strdup(c_str(value));
+                valcpy[MAXLEN] = '\0';
 
-                outbuff += line;
-                outbuff += "\n";
+                cstr_append(outbuff, "[");
+                cstr_append(outbuff, valcpy);
+                cstr_append(outbuff, "](");
+                cstr_append(outbuff, c_str(value));
+                cstr_append(outbuff, ")\n\n");
 
-                wline = true;
+                free(valcpy);
+            }
+            else
+            {
+                cstr_append(outbuff, c_str(value));
+                cstr_append(outbuff, "\n\n");
             }
         }
-        else if (wline && line == END)
+        else if (header && strncmp(start, END, END_LEN) == 0)
         {
-            outbuff += line;
-            outbuff += "\n";
-
-            wline = false;
-        }
-        else if (wline)
-        {
-            outbuff += line;
-            outbuff += "\n";
+            break;
         }
     }
 
-    outbuff += "</DL>\n";
-
-    if (!CFile::write(outpath, outbuff))
-        return 1;
+    if (!file_write_len(c_str(outpath), cstr_data(outbuff), cstr_size(outbuff)))
+        return false;
 
     return true;
 }

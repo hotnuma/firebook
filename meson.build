@@ -17,6 +17,7 @@ c_args = [
 
 app_deps = [
     dependency('tinyc'),
+    dependency('gumbo'),
 ]
 
 app_src = [
