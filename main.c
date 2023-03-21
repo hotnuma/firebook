@@ -106,13 +106,13 @@ static void node_search(GumboNode *node, CFile *outfile, const char *title)
                 char *valcpy = strdup(link);
                 valcpy[MAXLEN] = '\0';
 
-                cfile_writefmt(outfile, "[%s](%s)\n\n", valcpy, link);
+                cfile_writefmt(outfile, "[%s](%s)  \n\n", valcpy, link);
 
                 free(valcpy);
             }
             else
             {
-                cfile_writefmt(outfile, "%s\n\n", link);
+                cfile_writefmt(outfile, "%s  \n\n", link);
             }
         }
 
