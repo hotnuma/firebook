@@ -73,6 +73,12 @@ static void node_search(GumboNode *node, CFile *outfile, const char *title)
 
     if (node_getheader(node, &text))
     {
+        if (!title)
+        {
+            cfile_writefmt(outfile, "#### %s\n\n", text);
+            return;
+        }
+
         if (level <= current)
         {
             current = -1;
@@ -94,7 +100,7 @@ static void node_search(GumboNode *node, CFile *outfile, const char *title)
 
     else if (node_getlink(node, &text, &link))
     {
-        if (current != -1 && level > current)
+        if (!title || (current != -1 && level > current))
         {
             //print("%d : %s %s", level, text, link);
 
@@ -133,16 +139,20 @@ static void node_search(GumboNode *node, CFile *outfile, const char *title)
 
 bool _writeMd(const char *inpath, const char *search)
 {
-    if (!inpath || !strlen(inpath) || !search || !strlen(search))
+    if (!inpath || !strlen(inpath) /* || !search || !strlen(search)*/ )
         return false;
-
-    CStringAuto *temp = cstr_new(search);
-    cstr_replace(temp, " ", "_", true);
 
     CStringAuto *outpath = cstr_new(inpath);
     path_strip_ext(outpath, true);
-    cstr_append_c(outpath, ' ');
-    cstr_append(outpath, c_str(temp));
+
+    if (search && strlen(search) > 0)
+    {
+        CStringAuto *temp = cstr_new(search);
+        cstr_replace(temp, " ", "_", true);
+        cstr_append_c(outpath, '_');
+        cstr_append(outpath, c_str(temp));
+    }
+
     cstr_append(outpath, ".md");
 
     CFileAuto *file = cfile_new();

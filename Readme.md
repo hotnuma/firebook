@@ -6,7 +6,7 @@ Then it's possible to reorganize links into markdown documents such as these :
 
 https://github.com/hotnuma/doclinux  
 
-And then using a markdown converter, generate html files and add bookmarks to these into Firefox :-D
+And then using a markdown converter, generate html files again and add bookmarks to these into Firefox :-D
 
 
 
@@ -14,12 +14,18 @@ And then using a markdown converter, generate html files and add bookmarks to th
 
 In Firefox export all bookmarks using Ctrl+Shift+O and then export to html.
 
-Then extract a submenu into a md file.
+Then convert boolmarks into a md file.
 
-* Export "Misc" submenu into Misc.md
+* Export all bookmarks into bookmarks.md
     
     ```
-    firebook -i bookmark.html "Misc"
+    firebook -i bookmarks.html
+    ```
+
+* Export "Misc" submenu into bookmarks_Misc.md
+    
+    ```
+    firebook -i bookmarks.html "Misc"
     ```
 
 * Convert markdown to html
