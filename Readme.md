@@ -1,12 +1,12 @@
 ### Firebook
 
-This program converts a bookmark.html file exported from Firefox into a md file.
+This program converts a bookmark.html file exported from Firefox into a markdown file.
 
-Then it's possible to reorganize links into markdown documents such as there :
+Then it's possible to reorganize links into markdown documents such as these :
 
 https://github.com/hotnuma/doclinux  
 
-And then using a markdown converter, generate html files.
+And then using a markdown converter, generate html files and add bookmarks to these into Firefox :-D
 
 
 
@@ -22,7 +22,7 @@ Then extract a submenu into a md file.
     firebook -i bookmark.html "Misc"
     ```
 
-* Convert into Misc.html
+* Convert markdown to html
 
     Using hoedown available here :
     
