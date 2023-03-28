@@ -71,6 +71,14 @@ static void node_search(GumboNode *node, CFile *outfile, const char *title)
     const char *text;
     const char *link;
 
+    //const char *tag = node->v.element.original_tag.data;
+    //int tag_len = node->v.element.original_tag.length;
+    //char *tagstr = strndup(tag, MIN(tag_len, 48));
+
+    //print("%d : %s", level, tagstr);
+
+    //free(tagstr);
+
     if (node_getheader(node, &text))
     {
         if (!title)
